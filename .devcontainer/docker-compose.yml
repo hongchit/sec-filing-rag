@@ -9,6 +9,8 @@ services:
     volumes:
       - ..:/workspaces/sec-filing-rag:cached
       - devcontainer-uv-cache:/home/vscode/.cache/uv
+      - codex-home:/home/vscode/.codex
+      - ${HOME}/.codex/skills/bootstrap-project:/home/vscode/.agents/skills/bootstrap-project:ro
     environment:
       UV_CACHE_DIR: /home/vscode/.cache/uv
       UV_LINK_MODE: copy
@@ -33,4 +35,5 @@ services:
 volumes:
   devcontainer-uv-cache:
     name: devcontainer-uv-cache
+  codex-home:
   postgres-data:

@@ -12,6 +12,9 @@
 	"shutdownAction": "stopCompose",
 
 	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "22"
+		},
 		"ghcr.io/devcontainers-extra/features/uv:1": {}
 	},
 
@@ -30,7 +33,7 @@
 			],
 			"settings": {
 				"python.terminal.useEnvFile": true,
-				"python.envFile": "${workspaceFolder}/.env",
+				"python.envFile": "${workspaceFolder}/.env"
 			}
 		}
 	},
