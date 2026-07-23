@@ -1,13 +1,43 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/postgres
 {
-	"name": "Python 3 & PostgreSQL",
+	"name": "SEC Filing RAG",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/workspaces/sec-filing-rag",
+	"runServices": [
+		"app",
+		"db"
+	],
+	"shutdownAction": "stopCompose",
+
 	"features": {
 		"ghcr.io/devcontainers-extra/features/uv:1": {}
-	}
+	},
+
+	"remoteUser": "vscode",
+
+	// VS Code customizations
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.debugpy",
+				"ms-toolsai.datawrangler",
+				"ms-ossdata.vscode-pgsql",
+				"mechatroner.rainbow-csv",
+				"ms-vscode.makefile-tools"
+			],
+			"settings": {
+				"python.terminal.useEnvFile": true,
+				"python.envFile": "${workspaceFolder}/.env",
+			}
+		}
+	},
+
+	"postCreateCommand": ".devcontainer/post-create.sh",
+	"waitFor": "postCreateCommand"
+
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
