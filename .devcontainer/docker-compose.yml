@@ -6,6 +6,9 @@ services:
 
     env_file:
       - ../.env
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - ..:/workspaces/sec-filing-rag:cached
       - devcontainer-uv-cache:/home/vscode/.cache/uv
@@ -28,12 +31,92 @@ services:
       - ../.env
     volumes:
       - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
     # Add "forwardPorts": [5432] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  kestra_postgres:
+    image: postgres:18
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    volumes:
+      - kestra-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  kestra:
+    image: kestra/kestra:v1.3.21
+    pull_policy: always
+    user: "root"
+    command: server standalone
+    env_file:
+      - ../.env
+    volumes:
+      - kestra-data:/app/storage
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/kestra-wd:/tmp/kestra-wd
+    environment:
+      KESTRA_CONFIGURATION: |
+        datasources:
+          postgres:
+            url: jdbc:postgresql://kestra_postgres:5432/$${POSTGRES_DB}
+            driverClassName: org.postgresql.Driver
+            username: $${POSTGRES_USER}
+            password: $${POSTGRES_PASSWORD}
+        kestra:
+          server:
+            basicAuth:
+              username: $${KESTRA_BASIC_AUTH_USERNAME}
+              password: $${KESTRA_BASIC_AUTH_PASSWORD}
+          repository:
+            type: postgres
+          storage:
+            type: local
+            local:
+              basePath: "/app/storage"
+          queue:
+            type: postgres
+          tasks:
+            tmpDir:
+              path: /tmp/kestra-wd/tmp
+          url: http://localhost:8082/
+          ai:
+            type: gemini
+            gemini:
+              model-name: gemini-2.5-flash
+              api-key: $${GEMINI_API_KEY}
+    ports:
+      - "8082:8080"
+      - "8083:8081"
+    depends_on:
+      kestra_postgres:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=$${GRAFANA_USERNAME}
+      - GF_SECURITY_ADMIN_PASSWORD=$${GRAFANA_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
 
 volumes:
   devcontainer-uv-cache:
     name: devcontainer-uv-cache
   codex-home:
   postgres-data:
+  kestra-postgres-data:
+  kestra-data:
+  grafana-data:

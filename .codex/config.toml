@@ -1,0 +1,3 @@
+[mcp_servers.kestra]
+url = "https://api.kestra.io/v1/mcp"
+enabled = true

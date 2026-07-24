@@ -7,7 +7,10 @@
 	"workspaceFolder": "/workspaces/sec-filing-rag",
 	"runServices": [
 		"app",
-		"db"
+		"db",
+		"kestra_postgres",
+		"kestra",
+		"grafana"
 	],
 	"shutdownAction": "stopCompose",
 
