@@ -1,8 +1,8 @@
 ## 1. Stage 1.1 — PoC harness and decision record
 
-- [ ] 1.1 Define target CPU architecture, representative non-production fixtures, measurement method, evidence format, and accept, constrain, replace, or defer decision template.
-- [ ] 1.2 Keep PoC resources disposable and isolated from production manifests, credentials, and data.
-- [ ] 1.3 Record pinned inputs, reproducible commands, observed results, limitations, owners, and decisions for every PoC.
+- [x] 1.1 Define target CPU architecture, representative non-production fixtures, measurement method, evidence format, and accept, constrain, replace, or defer decision template.
+- [x] 1.2 Keep PoC resources disposable and isolated from production manifests, credentials, and data.
+- [x] 1.3 Record pinned inputs, reproducible commands, observed results, limitations, owners, and decisions for every PoC.
 
 ## 2. Stage 1.2 — PostgreSQL 18 extension stack PoC
 

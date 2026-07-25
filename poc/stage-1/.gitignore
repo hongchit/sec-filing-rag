@@ -1,0 +1,7 @@
+# Generated or machine-local PoC material. Reviewed evidence belongs in evidence/.
+raw/**
+!raw/.gitkeep
+*.local
+.env
+.env.*
+!.env.example
