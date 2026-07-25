@@ -35,6 +35,14 @@ The result SHALL present cited readable prose, inspectable source cards, collaps
 - **WHEN** a user selects an inline citation
 - **THEN** the corresponding filing excerpt and human-readable filing metadata are displayed without raw database identifiers
 
+#### Scenario: Source has optional page metadata
+- **WHEN** a citation includes a reliable qualified page coordinate
+- **THEN** the source card labels its scheme, such as printed page or source-PDF page, and otherwise omits page information
+
+#### Scenario: Observed heading differs
+- **WHEN** a filing's observed section heading differs from the canonical item title
+- **THEN** the source card presents the canonical item label consistently and makes the observed heading available without implying the two were identical
+
 ### Requirement: Responsive comparison
 Comparison results SHALL use parallel columns when space permits and stacked cards on small screens, followed by a common metrics table.
 
@@ -55,4 +63,3 @@ Stage 0 SHALL provide one small infrastructure verification page populated from 
 #### Scenario: Stage 0 healthy deployment
 - **WHEN** the infrastructure proof is healthy
 - **THEN** the page identifies deployment, frontend, API, application database, required extension, Kestra, and Kestra database status at the approved disclosure level
-

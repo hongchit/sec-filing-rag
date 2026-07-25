@@ -22,11 +22,25 @@ FastAPI SHALL provide liveness, readiness, version, and safe infrastructure-stat
 - **THEN** liveness remains process-oriented, readiness fails, and unready pods stop receiving traffic
 
 ### Requirement: Required PostgreSQL extensions
-The application PostgreSQL image SHALL install and report compatible, pinned versions of pgvector and the selected PostgreSQL BM25 extension before stages that depend on them.
+The application database SHALL use PostgreSQL 18 and SHALL install and report compatible, pinned versions of pgvector and the trial `pg_textsearch` extension before stages that depend on them.
 
 #### Scenario: Extension verification
 - **WHEN** deployment smoke tests query extension availability
 - **THEN** the tests confirm the expected extension names and versions without exposing connection credentials
+
+### Requirement: Single-node persistence boundary
+The initial K3s environment SHALL use a documented single-node availability model with separate local persistent volumes and SHALL identify database backup, disaster recovery, recovery-point objectives, and recovery-time objectives as outside the MVP boundary.
+
+#### Scenario: Database pod restart
+- **WHEN** either PostgreSQL pod restarts while its persistent volume remains available
+- **THEN** its deployment-check record or workflow history remains available without claiming recovery from volume or host loss
+
+### Requirement: Minimal internal monitoring
+When Stage 0 includes Grafana, it SHALL remain internal-only and use a metrics source to validate application availability and latency, errors, pod restarts, database reachability, persistent-volume usage, and Kestra health without becoming a readiness dependency.
+
+#### Scenario: Monitoring unavailable
+- **WHEN** Grafana or its metrics source is unavailable
+- **THEN** public application readiness remains governed by application dependencies and monitoring remains inaccessible through public ingress
 
 ### Requirement: Immutable safe deployment
 CI/CD SHALL test pull requests and deploy immutable commit-addressed images with rollout verification, smoke tests, deployment serialization, and a tested restoration path.
@@ -34,4 +48,3 @@ CI/CD SHALL test pull requests and deploy immutable commit-addressed images with
 #### Scenario: Unhealthy release
 - **WHEN** a newly deployed version fails readiness or smoke tests
 - **THEN** the pipeline fails and a previously healthy version can be restored without losing persistent records
-

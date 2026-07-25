@@ -1,6 +1,6 @@
 ## 1. Stage 0.1 — Reproducible K3s foundation
 
-- [ ] 1.1 Document target topology, namespaces, DNS, storage, environment overlays, prerequisites, and secret bootstrap.
+- [ ] 1.1 Document the approved single-node dedicated-VM topology, availability limitation, namespaces, DNS, local storage, environment overlays, prerequisites, and secret bootstrap.
 - [ ] 1.2 Add reproducible K3s, Traefik, namespace, storage, Secret-reference, and ConfigMap manifests.
 - [ ] 1.3 Verify a clean environment can bind a persistent volume and run a disposable internal workload.
 
@@ -18,8 +18,8 @@
 
 ## 4. Stage 0.4 — Application PostgreSQL persistence
 
-- [ ] 4.1 Select and pin a PostgreSQL image compatible with pgvector and the chosen BM25 extension.
-- [ ] 4.2 Deploy application PostgreSQL with dedicated credentials, service, persistent volume, resource limits, and backup-ready configuration.
+- [ ] 4.1 Build and pin a PostgreSQL 18 image containing tested versions of pgvector and trial `pg_textsearch`.
+- [ ] 4.2 Deploy application PostgreSQL with dedicated credentials, service, persistent volume, and resource limits while documenting that host/volume disaster recovery is outside the MVP.
 - [ ] 4.3 Add a minimal migration and adapter for deployment-check records using parameterized database access.
 - [ ] 4.4 Verify simple query, extension availability, write/read behavior, and persistence across application and database pod restarts.
 
@@ -58,14 +58,16 @@
 
 - [ ] 10.1 Document and automate restoration of the last known-good stateless application version.
 - [ ] 10.2 Rehearse an unhealthy release and verify healthy traffic plus persistent records survive restoration.
-- [ ] 10.3 Recreate the environment from version-controlled configuration and documented secret inputs.
-- [ ] 10.4 Run and record the complete Stage 0 acceptance suite.
+- [ ] 10.3 Recreate stateless services and configuration from version-controlled manifests and documented secret inputs without claiming database disaster recovery.
+- [ ] 10.4 Deploy minimal internal-only Grafana and a metrics source if they prove the approved service, database, PVC, and Kestra signals without affecting readiness.
+- [ ] 10.5 Run and record the complete Stage 0 acceptance suite, including the documented backup/recovery exclusion.
 
 ## 11. Stage 1.1 — Google authentication
 
-- [ ] 11.1 Choose and document the Google OAuth/OIDC session architecture and threat model.
-- [ ] 11.2 Implement verified-email login, stable-subject user resolution, secure session validation, logout, and validated return URLs.
-- [ ] 11.3 Test invalid state/nonce, unverified email, expired session, logout, token redaction, and account return behavior.
+- [ ] 11.1 Document the approved Google Authorization Code with PKCE and FastAPI-owned opaque-session threat model.
+- [ ] 11.2 Implement verified-email login, stable-`sub` user resolution, hashed server sessions, secure cookies, CSRF/origin validation, logout, revocation, and validated return URLs.
+- [ ] 11.3 Enforce the seven-day absolute and twelve-hour idle session limits with rotation after login and privilege changes.
+- [ ] 11.4 Test invalid state/nonce, unverified email, CSRF, origin, expiry, deactivation, logout, token redaction, and account return behavior.
 
 ## 12. Stage 1.2 — Two-role authorization
 
@@ -81,22 +83,23 @@
 
 ## 14. Stage 1.4 — Minimal production schema and seeded filing
 
-- [ ] 14.1 Model companies, filings, collections, corpus builds, sections, chunk sets, chunks, embeddings, and citation lineage.
-- [ ] 14.2 Add reversible migrations, constraints, readiness transitions, and idempotent repository operations.
-- [ ] 14.3 Build a repeatable import for one approved 10-K with extraction, corpus, chunking, and source metadata.
-- [ ] 14.4 Validate corpus completeness, legitimate item absence, duplicate import handling, and filing-to-chunk traceability.
+- [ ] 14.1 Model normalized companies, ticker aliases, CIK identity, filings and sections with canonical/observed headings and qualified optional page coordinates; immutable corpus builds and chunk metadata projections; embedding sets; vectors; compatible indexes; and citation lineage.
+- [ ] 14.2 Model multi-target query scope, per-source retrieval results, typed analytical metrics, immutable configuration snapshots, and purged-artifact state.
+- [ ] 14.3 Add reversible migrations, dimension/configuration constraints, readiness transitions, cleanup protections, and idempotent repository operations.
+- [ ] 14.4 Build a repeatable import for one approved 10-K with extraction, corpus, chunking, source metadata, and OpenAI embedding-set metadata.
+- [ ] 14.5 Validate corpus completeness, legitimate item absence, table-of-contents/body heading disambiguation, title normalization, page-scheme qualification, duplicate import handling, filing-to-chunk traceability, and incompatible-vector rejection.
 
 ## 15. Stage 1.5 — One retrieval path
 
 - [ ] 15.1 Define normalized retriever and result contracts independent of SQLAlchemy and provider types.
-- [ ] 15.2 Implement the initial vector retriever with allowlisted filters, version compatibility, controlled top-k, and parameterized queries.
+- [ ] 15.2 Implement the initial OpenAI `text-embedding-3-small` 1,536-dimensional embedding adapter and compatible vector retriever with allowlisted filters, version compatibility, controlled top-k, and parameterized queries.
 - [ ] 15.3 Expose validated ticker, filing, section, and question query contracts with request and pagination limits.
 - [ ] 15.4 Test ranked retrieval, unsupported/ambiguous ticker, invalid filters, incompatible embedding versions, and tenant isolation.
 
 ## 16. Stage 1.6 — Grounded answer and citations
 
 - [ ] 16.1 Implement context limits, source delimiting, stable citation handles, and prompt-injection-aware context construction.
-- [ ] 16.2 Implement the centralized gateway port and one allowlisted generation-provider adapter with timeouts, retries, and normalized errors.
+- [ ] 16.2 Implement the centralized gateway port and pinned OpenAI `gpt-5-mini-2025-08-07` Responses API adapter with at most two transient retries, operation deadlines, normalized errors, and no automatic fallback.
 - [ ] 16.3 Add a versioned grounded-answer prompt and structured citation validation.
 - [ ] 16.4 Test supported, insufficient-evidence, invalid-citation, provider-failure, unsafe-content-rendering, and financial-advice cases.
 
@@ -109,7 +112,7 @@
 
 ## 18. Stage 1.8 — Usage cost and basic budgets
 
-- [ ] 18.1 Model immutable pricing, usage/cost ledger entries, budgets, reservations, decisions, and reconciliation.
+- [ ] 18.1 Model effective-dated immutable OpenAI pricing, external/local inference ledger entries, budgets, reservations, decisions, and reconciliation.
 - [ ] 18.2 Route generation usage through atomic global and per-experiment/job reservation and reconciliation.
 - [ ] 18.3 Implement explicit block and configured-fallback results without silent substitution.
 - [ ] 18.4 Test concurrent near-limit calls, provider failure, underestimated usage, expired reservation recovery, and ledger reconciliation.
@@ -118,13 +121,13 @@
 
 - [ ] 19.1 Build the responsive authenticated shell with Ask, History, Jobs, Usage, user controls, and role-gated Admin navigation.
 - [ ] 19.2 Build the analyst-focused query form with ticker resolution, latest-10-K scope, multiline question, and collapsed Advanced Settings.
-- [ ] 19.3 Build cited answer, source-card, collapsed run-detail, feedback, evaluation, comparison, and bookmark controls.
+- [ ] 19.3 Build cited answer and source cards using canonical item labels, preserved observed headings, stable source anchors, and only qualified optional page coordinates, plus collapsed run-detail, feedback, evaluation, comparison, and bookmark controls.
 - [ ] 19.4 Add accessible loading, empty, validation, insufficient-evidence, and error states with safe text rendering.
 - [ ] 19.5 Verify the end-to-end login, seeded query, citation, cost, and history flow on desktop and mobile.
 
 ## 20. Stage 2.1 — Filing discovery and EDGAR policy
 
-- [ ] 20.1 Define authoritative ticker/CIK resolution, latest-filing selection, accession validation, and legitimate-section-absence policy.
+- [ ] 20.1 Implement authoritative ticker-to-CIK resolution and the latest accepted original-`10-K` policy while rejecting `10-K/A` as unsupported for the MVP.
 - [ ] 20.2 Implement an SSRF-resistant, rate-limited SEC adapter with fixed endpoints, HTTPS, timeouts, response limits, and compliant User-Agent construction.
 - [ ] 20.3 Implement trigger-dependent contact selection, verified-email disclosure, actor audit, encrypted/access-controlled persistence, and structured redaction.
 - [ ] 20.4 Test user, schedule, admin backfill, retry, ambiguous security, unsafe identifier, and contact-leakage cases.
@@ -205,7 +208,12 @@
 ## 32. Stage 3.3 — Vector strategy formalization
 
 - [ ] 32.1 Version distance metric, embedding compatibility, index parameters, top-k, and metadata filters.
-- [ ] 32.2 Add deterministic vector retrieval fixtures and explainable advanced score display.
+- [ ] 32.2 Implement a pinned CPU-only `sentence-transformers/all-MiniLM-L6-v2` adapter with an immutable model artifact, 384-dimensional normalized vectors, cosine similarity, and no runtime model download.
+- [ ] 32.3 Create model-compatible MiniLM chunk and embedding sets, testing the 256-word-piece truncation boundary rather than silently truncating an existing chunk set.
+- [ ] 32.4 Support concurrent OpenAI and MiniLM indexes selected explicitly by experiment configuration.
+- [ ] 32.5 Add controlled and optimized-pipeline comparison fixtures covering quality, latency, input units, external/infrastructure cost, chunking differences, and index size.
+- [ ] 32.6 Add dependency-aware admin retire/purge operations with size preview, active/shared protections, audit, and preserved experiment evidence.
+- [ ] 32.7 Add deterministic vector retrieval fixtures and explainable advanced score display.
 
 ## 33. Stage 3.4 — Deterministic hybrid retrieval
 
@@ -292,10 +300,11 @@
 
 - [ ] 46.1 Define and test a collection adapter contract for taxonomy, extraction, completeness, citation, ingestion, and query scope.
 - [ ] 46.2 Add remaining 10-K sections as a new immutable corpus version without changing historical experiments.
-- [ ] 46.3 Add Form 10-Q discovery, extraction, completeness, citation, retrieval, and evaluation fixtures.
-- [ ] 46.4 Add Form 8-K event/item semantics and explicit multi-filing scope.
-- [ ] 46.5 Add reproducible cross-period and cross-filing selection, context balancing, citation grouping, and cost control.
-- [ ] 46.6 Add an approval and provenance process for each non-SEC collection before query enablement.
+- [ ] 46.3 Design and add versioned base-filing-plus-amendment overlay support for `10-K/A`.
+- [ ] 46.4 Add Form 10-Q discovery, extraction, completeness, citation, retrieval, and evaluation fixtures.
+- [ ] 46.5 Add Form 8-K event/item semantics and explicit multi-filing scope.
+- [ ] 46.6 Add reproducible cross-period and cross-filing selection, context balancing, citation grouping, and cost control.
+- [ ] 46.7 Add an approval and provenance process for each non-SEC collection before query enablement.
 
 ## 47. Stage 6 — Agentic expansion
 

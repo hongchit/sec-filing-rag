@@ -11,6 +11,7 @@ Analysts need a secure, reproducible way to ask questions about SEC filings and 
 - Introduce durable, deduplicated ingestion jobs orchestrated by Kestra, including scheduled and on-demand ingestion, persistent progress, retries, and automatic pending-query continuation.
 - Introduce immutable experiment, configuration-version, evaluation, usage, cost, quota, and budget records.
 - Introduce a centralized AI gateway through which all billable model operations pass.
+- Start with OpenAI generation and embeddings, then support controlled comparison with pinned CPU-local sentence-transformers embedding pipelines.
 - Introduce a Tailwind CSS interface centered on asking questions, monitoring ingestion, and comparing results, with advanced controls hidden by default.
 - Introduce a separate administrative experience for ingestion, jobs, models, budgets, users, and operational status.
 - Introduce strict input validation and normalization, output encoding, safe outbound-request policies, least-privilege service access, sensitive-data redaction, abuse controls, idempotency, and transactional concurrency enforcement.
@@ -39,4 +40,4 @@ None. This repository has no existing product specifications.
 
 ## Impact
 
-The change defines a greenfield Next.js/React/TypeScript/Tailwind frontend; Python/FastAPI/Pydantic/SQLAlchemy/Alembic backend; application PostgreSQL with pgvector and a PostgreSQL BM25 extension; separate Kestra and Kestra PostgreSQL workloads; Google authentication; external SEC EDGAR and model-provider adapters; K3s/Traefik deployment; and GitHub Actions CI/CD. It establishes the contracts that later implementation changes must follow without implementing application functionality in this change.
+The change defines a greenfield Next.js/React/TypeScript/Tailwind frontend; Python/FastAPI/Pydantic/SQLAlchemy/Alembic backend; PostgreSQL 18 with pgvector and a trial of `pg_textsearch`; separate Kestra and Kestra PostgreSQL workloads; Google authentication with FastAPI-owned opaque sessions; initial OpenAI and later CPU-local embedding adapters; external SEC EDGAR and model-provider adapters; an initial single-node K3s/Traefik deployment with persistent volumes; and GitHub Actions CI/CD. It establishes the contracts that later implementation changes must follow without implementing application functionality in this change.

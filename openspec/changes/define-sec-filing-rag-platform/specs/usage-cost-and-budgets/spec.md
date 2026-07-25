@@ -1,11 +1,15 @@
 ## ADDED Requirements
 
-### Requirement: Categorized usage ledger
-Every billable call SHALL record provider, model, purpose, category, token or embedding units, cache usage when available, latency, immutable pricing version, calculated cost, relevant user/job/experiment/trace identifiers, and timestamp.
+### Requirement: Categorized inference ledger
+Every external or local model execution SHALL record execution provider/type, model and revision, purpose, category, input/token/embedding units, batch size when applicable, cache usage when available, latency, runtime/hardware metadata where applicable, calculated external and optional infrastructure cost, relevant user/job/experiment/trace identifiers, and timestamp; billable calls SHALL reference an immutable pricing version.
 
 #### Scenario: Generation call completes
 - **WHEN** the gateway receives provider usage for a generation call
 - **THEN** it writes a generation-category ledger entry linked to the experiment and pricing version
+
+#### Scenario: Local MiniLM batch completes
+- **WHEN** the CPU-local embedding adapter completes a batch
+- **THEN** it records zero external-provider cost plus input units, batch size, latency, pinned model/runtime versions, hardware class, and any configured infrastructure-cost allocation
 
 ### Requirement: Separately identifiable costs
 Ingestion, embedding, generation, evaluation, agent, system, and applicable retrieval infrastructure costs SHALL remain separately identifiable even when summaries combine categories.
@@ -34,4 +38,3 @@ The platform SHALL support global, provider, model, category, job, user, and exp
 #### Scenario: Multiple limits apply
 - **WHEN** a call is subject to several budget policies
 - **THEN** the documented policy resolution applies every relevant constraint before permitting execution
-
