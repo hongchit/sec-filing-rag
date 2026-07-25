@@ -1,30 +1,45 @@
 # PoC decision: postgres-extensions
 
-- Outcome: `defer`
+- Outcome: `constrain`
 - Owner: repository maintainer
 - Reviewer: pending
-- Decision date (UTC): pending
+- Decision date (UTC): 2026-07-25
 - Evidence: `evidence.md`
 
 ## Decision
 
-Stage 2 may not yet rely on a PostgreSQL extension image. Execute the ARM64 sidecar preflight first, then repeat the accepted pinned inputs on native amd64 before changing this outcome.
+Stage 2 may rely provisionally on PostgreSQL 18.4, pgvector 0.8.2, and
+`pg_textsearch` 1.2.0 for functional architecture planning. Native ARM64 is a
+validated and acceptable deployment option. In the absence of an amd64
+environment, source-level amd64 compatibility is assumed from the successful
+ARM64 run, but remains explicitly unmeasured.
 
 ## Rationale
 
-The current environment is ARM64 while the approved target is `linux/amd64`. Separating functional preflight from target acceptance avoids presenting emulated or cross-architecture measurements as production evidence.
+The current environment is ARM64 and ARM64 is now permitted as a deployment
+architecture. The run proved source/package compatibility, preload, extension
+coexistence, representative retrieval, expected plans, restart persistence, and
+cleanup. The owner accepts this as sufficient functional evidence for the
+current milestone while retaining architecture-specific evidence labels.
 
 ## Constraints
 
-- Do not promote ARM64 image digests or performance measurements.
+- Do not represent ARM64 image digests or performance measurements as amd64 measurements.
+- Build architecture-specific images and verify the resolved package checksum for each architecture before deployment.
 - Keep lexical retrieval behind the retriever port.
 - Do not modify or reuse application/Kestra databases, volumes, or credentials.
 - `pg_textsearch` must be configured through `shared_preload_libraries`.
 
 ## Stage 2 consequences
 
-The application PostgreSQL image, extension pins, and resource settings remain blocked pending completed ARM64 preflight and later amd64 confirmation.
+The extension versions and PostgreSQL lineage may inform Stage 2. Image digests
+remain architecture-specific, and resource settings remain provisional until
+the Stage 1 resource-envelope PoC runs on the selected deployment host.
 
 ## Follow-up
 
-Verify official source revisions, implement the disposable ARM64 sidecar, execute functional tests, and retain this `defer` outcome until amd64 evidence exists.
+Complete the missing memory and index-size measurements before closing Stage
+1.2. If amd64 becomes the selected deployment host, verify the official PG18
+amd64 `pg_textsearch` artifact and resolved image digest during image delivery;
+this is a portability confirmation rather than a blocker to the current ARM64
+functional milestone.

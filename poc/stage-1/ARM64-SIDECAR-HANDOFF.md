@@ -19,7 +19,7 @@ ARM64 results do **not** prove:
 - native amd64 latency, memory, image-size, or resource-envelope acceptance.
 - that ARM64-specific binaries or image digests may be promoted to Stage 2.
 
-Stage 1.2 remains incomplete until the same pinned source revisions pass on native amd64 or an approved amd64 runner.
+ARM64 is an acceptable deployment architecture. By owner decision, a successful native ARM64 run permits a provisional amd64 compatibility assumption, provided documentation never presents ARM64 measurements or digests as amd64 evidence. Stage 1.2 remains incomplete until all required measurements, including memory and index size, are recorded.
 
 ## Safe execution model
 
@@ -158,6 +158,6 @@ Do not mark Stage 1.2 complete merely because the rebuilt environment starts.
 - OpenSpec change: `define-sec-filing-rag-platform`
 - Completed implementation tasks: Stage 1.1 tasks 1.1–1.3
 - Active work: Stage 1.2 PostgreSQL extension-stack PoC
-- Target: `linux/amd64`
-- Current preflight environment: `linux/arm64`
+- Deployment architectures: validated `linux/arm64`; provisionally assumed `linux/amd64`
+- Current environment: `linux/arm64`
 - Next action: verify and pin exact extension source revisions, then implement the standalone ARM64 sidecar files
