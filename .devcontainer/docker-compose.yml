@@ -25,12 +25,21 @@ services:
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
   db:
-    image: pgvector/pgvector:pg18
+    platform: linux/arm64
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    image: sec-filing-rag-dev-postgres:18.4-vector0.8.2-textsearch1.2.0
     restart: unless-stopped
     env_file:
       - ../.env
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_textsearch
     volumes:
       - postgres-data:/var/lib/postgresql
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 5s
