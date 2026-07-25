@@ -92,7 +92,7 @@ The context builder accepts normalized retrieval results, enforces context limit
 
 Every billable embedding, generation, evaluation, and future agent call passes through a centralized gateway. The gateway handles allowlisted providers/models, rate limits, timeouts, normalized errors, retries, telemetry, usage, pricing, and budget decisions. Application modules cannot import provider clients directly.
 
-Stage 1 uses OpenAI `text-embedding-3-small` at 1,536 dimensions and pinned `gpt-5-mini-2025-08-07` generation through the Responses API. The gateway permits at most two retries for transient rate-limit, selected timeout, and server errors using bounded exponential backoff with jitter; it does not retry validation, authentication, policy, context-limit, or budget failures. The MVP performs no automatic provider or model fallback.
+Stage 3 uses OpenAI `text-embedding-3-small` at 1,536 dimensions and pinned `gpt-5-mini-2025-08-07` generation through the Responses API. The gateway permits at most two retries for transient rate-limit, selected timeout, and server errors using bounded exponential backoff with jitter; it does not retry validation, authentication, policy, context-limit, or budget failures. The MVP performs no automatic provider or model fallback.
 
 After the OpenAI path is validated, a local embedding adapter may use pinned `sentence-transformers/all-MiniLM-L6-v2`, producing 384-dimensional normalized vectors for cosine similarity. It uses pinned CPU-only PyTorch wheels and a pinned model revision packaged into an immutable image or model artifact; production pods do not download mutable model assets at startup. Its default 256-word-piece truncation requires explicit SEC-chunk testing and may drive a distinct chunking configuration.
 
@@ -120,26 +120,31 @@ The query page is an analyst search tool rather than a workflow console. Missing
 
 ### Deployment and delivery
 
-Stage 0 proves a single-node K3s baseline on a dedicated VM, Traefik TLS ingress, immutable frontend/API images, PostgreSQL 18 with pinned pgvector and a pinned trial of `pg_textsearch`, isolated Kestra PostgreSQL, Kestra, local SSD-backed persistent volumes, secrets/configuration, CI/CD, readiness, smoke tests, persistence, and rollback. Only Next.js and FastAPI ingress are public.
+Stage 1 is a disposable pre-foundation PoC gate. It resolves only uncertainties capable of changing the foundation: PostgreSQL 18 extension coexistence, Kestra database compatibility, target storage behavior, Traefik same-origin and SSE routing, target-architecture image and registry delivery, CI-to-K3s connectivity, and the single-node resource envelope. Every PoC pins inputs, uses representative but non-production data, records commands and evidence, and ends in an explicit accept, constrain, replace, or defer decision. PoC resources are not promoted directly into production manifests, and product concerns such as Google authentication, OpenAI, MiniLM, SEC extraction, production schema, retrieval quality, and evaluation remain in their owning stages.
+
+The Stage 1 PostgreSQL PoC is the first gate because it can change the application database image and retrieval architecture. It must prove pinned pgvector and trial `pg_textsearch` versions build and load together on PostgreSQL 18; coexist under representative vector, BM25, and metadata-filtered queries; retain data and indexes across a disposable restart; expose version metadata; use expected query plans; and have understood rebuild and upgrade procedures. Failure of `pg_textsearch` does not couple the domain to another implementation: lexical retrieval remains behind the retriever port and a replacement is selected before Stage 2.
+
+Stage 2 proves a single-node K3s baseline on a dedicated VM, Traefik TLS ingress, immutable frontend/API images, the PoC-approved PostgreSQL and extension versions, isolated Kestra PostgreSQL, Kestra, local SSD-backed persistent volumes, secrets/configuration, CI/CD, readiness, smoke tests, persistence, and rollback. Only Next.js and FastAPI ingress are public.
 
 Application PostgreSQL, Kestra PostgreSQL, and Kestra storage use separate PVCs and prove persistence across pod restarts. Database backup, disaster recovery, recovery-point objectives, and recovery-time objectives are outside the MVP boundary. The MVP makes no high-availability or disaster-recovery claim; those controls remain required future production-hardening work before stronger durability claims.
 
-Stage 0 may include internal-only Grafana with a metrics source such as Prometheus when it proves collection of API availability/latency/errors, pod restarts, PostgreSQL reachability, PVC usage, and Kestra health. Monitoring is not an application readiness dependency, must contain no filing/user/sensitive payloads, and must not expand into a general observability dashboard.
+Stage 2 may include internal-only Grafana with a metrics source such as Prometheus only when the Stage 1 resource-envelope PoC shows that its value and resource cost are acceptable. It may prove collection of API availability/latency/errors, pod restarts, PostgreSQL reachability, PVC usage, and Kestra health. Monitoring is not an application readiness dependency, must contain no filing/user/sensitive payloads, and must not expand into a general observability dashboard.
 
 Delivery proceeds through independently testable iterations:
 
-1. Stage 0: deployment foundation, applications, ingress/TLS, databases/extensions, readiness, Kestra, internal connectivity, CI, deployment, rollback.
-2. Stage 1: Google login, roles, versioned configuration, seeded corpus, one retriever, grounded answer, experiments, usage/cost, basic budget, end-to-end UI.
-3. Stage 2: filing discovery, EDGAR identity, ingestion pipeline, jobs, manual/on-demand/scheduled triggers, deduplication, SSE, continuation, history.
-4. Stage 3: common retriever contract, BM25, formalized vector, hybrid, selection, intentional comparison, comparison UI.
-5. Stage 4: deterministic and model evaluation, profile policies, benchmark data/workflows, scoped budgets, and governance views.
-6. Stage 5: new corpus adapters, additional forms, and cross-period queries.
-7. Stage 6: bounded, policy-compliant agent execution and comparison.
+1. Stage 1: disposable infrastructure PoCs and a recorded go/no-go foundation decision.
+2. Stage 2: deployment foundation, applications, ingress/TLS, databases/extensions, readiness, Kestra, internal connectivity, CI, deployment, rollback.
+3. Stage 3: Google login, roles, versioned configuration, seeded corpus, one retriever, grounded answer, experiments, usage/cost, basic budget, end-to-end UI.
+4. Stage 4: filing discovery, EDGAR identity, ingestion pipeline, jobs, manual/on-demand/scheduled triggers, deduplication, SSE, continuation, history.
+5. Stage 5: common retriever contract, BM25, formalized vector, hybrid, selection, intentional comparison, comparison UI.
+6. Stage 6: deterministic and model evaluation, profile policies, benchmark data/workflows, scoped budgets, governance views, and MVP acceptance.
+7. Stage 7: new corpus adapters, additional forms, and cross-period queries.
+8. Stage 8: bounded, policy-compliant agent execution and comparison.
 
 ## Risks / Trade-offs
 
 - [Greenfield scope is too broad for one implementation change] → Treat this change as the baseline specification and implement each stage or bounded iteration through subsequent changes.
-- [The `pg_textsearch` trial may expose PostgreSQL 18 compatibility or operational issues] → Pin both extensions, prove coexistence and representative retrieval in Stage 0, rehearse restore/index rebuild and upgrades, and retain the ability to revisit the extension before Stage 3.
+- [The `pg_textsearch` trial may expose PostgreSQL 18 compatibility or operational issues] → Pin both extensions, prove coexistence and representative retrieval in Stage 1, understand index rebuild and upgrades, and select a retriever-port-compatible alternative before Stage 2 if it fails.
 - [Shared ingestion conflicts with user ownership and cancellation] → Separate request intent from shared job execution and restrict shared cancellation to admins.
 - [Automatic continuation spends money after the user leaves] → Persist consent, reserve or recheck budgets, and skip cancelled/expired pending requests.
 - [Concurrent calls overspend budgets] → Use transactional reservations and reconciliation rather than check-then-spend.
@@ -156,7 +161,7 @@ Delivery proceeds through independently testable iterations:
 
 ## Migration Plan
 
-There is no production application data to migrate. Establish Stage 0 infrastructure first and require its acceptance suite before application schema work. Apply application migrations through versioned deployment jobs, seed only the controlled Stage 1 corpus, and roll out later capabilities behind allowlists or feature flags. Preserve backward-compatible API and event contracts within a stage. Roll back stateless application images independently; database migrations must include a tested forward-fix or reversible path appropriate to data risk. Persistent volumes and secret/configuration recreation are MVP prerequisites; database backup and disaster recovery are explicitly deferred production-hardening work.
+There is no production application data to migrate. Complete the disposable Stage 1 PoC gate and record its decisions before creating the separate Stage 2 foundation implementation change. Require the Stage 2 acceptance suite before application schema work. Apply application migrations through versioned deployment jobs, seed only the controlled Stage 3 corpus, and roll out later capabilities behind allowlists or feature flags. Preserve backward-compatible API and event contracts within a stage. Roll back stateless application images independently; database migrations must include a tested forward-fix or reversible path appropriate to data risk. Persistent volumes and secret/configuration recreation are MVP prerequisites; database backup and disaster recovery are explicitly deferred production-hardening work.
 
 ## Open Questions
 

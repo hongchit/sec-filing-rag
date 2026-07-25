@@ -15,7 +15,7 @@ Analysts need a secure, reproducible way to ask questions about SEC filings and 
 - Introduce a Tailwind CSS interface centered on asking questions, monitoring ingestion, and comparing results, with advanced controls hidden by default.
 - Introduce a separate administrative experience for ingestion, jobs, models, budgets, users, and operational status.
 - Introduce strict input validation and normalization, output encoding, safe outbound-request policies, least-privilege service access, sensitive-data redaction, abuse controls, idempotency, and transactional concurrency enforcement.
-- Deliver the platform incrementally, beginning with a K3s deployment proof and progressing through an authenticated RAG skeleton, ingestion, retrieval comparison, evaluation and governance, corpus expansion, and optional agentic execution.
+- Deliver the platform incrementally through bounded implementation changes, beginning with a disposable pre-foundation proof-of-concept gate, then a K3s deployment foundation, authenticated RAG skeleton, ingestion, retrieval comparison, evaluation and governance, corpus expansion, and optional agentic execution.
 
 ## Capabilities
 
@@ -40,4 +40,4 @@ None. This repository has no existing product specifications.
 
 ## Impact
 
-The change defines a greenfield Next.js/React/TypeScript/Tailwind frontend; Python/FastAPI/Pydantic/SQLAlchemy/Alembic backend; PostgreSQL 18 with pgvector and a trial of `pg_textsearch`; separate Kestra and Kestra PostgreSQL workloads; Google authentication with FastAPI-owned opaque sessions; initial OpenAI and later CPU-local embedding adapters; external SEC EDGAR and model-provider adapters; an initial single-node K3s/Traefik deployment with persistent volumes; and GitHub Actions CI/CD. It establishes the contracts that later implementation changes must follow without implementing application functionality in this change.
+The change defines a greenfield Next.js/React/TypeScript/Tailwind frontend; Python/FastAPI/Pydantic/SQLAlchemy/Alembic backend; PostgreSQL 18 with pgvector and a trial of `pg_textsearch`; separate Kestra and Kestra PostgreSQL workloads; Google authentication with FastAPI-owned opaque sessions; initial OpenAI and later CPU-local embedding adapters; external SEC EDGAR and model-provider adapters; an initial single-node K3s/Traefik deployment with persistent volumes; and GitHub Actions CI/CD. It establishes the contracts that later bounded implementation changes must follow. Disposable PoCs resolve infrastructure-changing uncertainties before the Stage 2 foundation is built; this baseline change itself implements no application functionality.

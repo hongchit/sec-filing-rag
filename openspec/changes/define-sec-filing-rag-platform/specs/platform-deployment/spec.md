@@ -1,5 +1,19 @@
 ## ADDED Requirements
 
+### Requirement: Pre-foundation proof gate
+Before foundation implementation begins, the platform SHALL complete disposable proofs for PostgreSQL-extension compatibility, Kestra database compatibility, target storage behavior, ingress and SSE routing, target-architecture image delivery, CI deployment connectivity, and the single-node resource envelope.
+
+#### Scenario: Foundation decision
+- **WHEN** the pre-foundation proofs complete
+- **THEN** their pinned inputs, reproducible procedure, measured evidence, limitations, and accept, constrain, replace, or defer decisions are recorded before Stage 2 manifests are implemented
+
+### Requirement: PostgreSQL extension proof
+The first pre-foundation proof SHALL test compatible pinned pgvector and trial `pg_textsearch` versions together on PostgreSQL 18 using representative vector, BM25, and metadata-filtered retrieval without coupling the retriever contract to the extension.
+
+#### Scenario: Extension candidate fails
+- **WHEN** `pg_textsearch` cannot satisfy the compatibility or operational acceptance criteria
+- **THEN** PostgreSQL 18 and pgvector may remain while a retriever-port-compatible lexical-search alternative is selected before Stage 2
+
 ### Requirement: Isolated K3s service topology
 The platform SHALL deploy Next.js and FastAPI behind Traefik TLS ingress while PostgreSQL, Kestra PostgreSQL, Kestra, and internal service ports remain inaccessible through public ingress.
 
@@ -36,7 +50,7 @@ The initial K3s environment SHALL use a documented single-node availability mode
 - **THEN** its deployment-check record or workflow history remains available without claiming recovery from volume or host loss
 
 ### Requirement: Minimal internal monitoring
-When Stage 0 includes Grafana, it SHALL remain internal-only and use a metrics source to validate application availability and latency, errors, pod restarts, database reachability, persistent-volume usage, and Kestra health without becoming a readiness dependency.
+When Stage 2 includes Grafana after an acceptable Stage 1 resource-envelope decision, it SHALL remain internal-only and use a metrics source to validate application availability and latency, errors, pod restarts, database reachability, persistent-volume usage, and Kestra health without becoming a readiness dependency.
 
 #### Scenario: Monitoring unavailable
 - **WHEN** Grafana or its metrics source is unavailable

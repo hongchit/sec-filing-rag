@@ -57,9 +57,9 @@ The UI SHALL provide Ask, Compare, History, Jobs, and Usage navigation and SHALL
 - **WHEN** a `user` views navigation
 - **THEN** administrative navigation is absent and direct admin API access remains forbidden
 
-### Requirement: Minimal Stage 0 page
-Stage 0 SHALL provide one small infrastructure verification page populated from safe FastAPI status and version responses and SHALL NOT become a general observability dashboard.
+### Requirement: Minimal Stage 2 page
+Stage 2 SHALL provide one small infrastructure verification page populated from safe FastAPI status and version responses and SHALL NOT become a general observability dashboard.
 
-#### Scenario: Stage 0 healthy deployment
+#### Scenario: Stage 2 healthy deployment
 - **WHEN** the infrastructure proof is healthy
 - **THEN** the page identifies deployment, frontend, API, application database, required extension, Kestra, and Kestra database status at the approved disclosure level
