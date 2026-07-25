@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-07-25
+goal: Create an implementation-ready specification baseline for a secure,
+  modular, authenticated SEC filing RAG platform.

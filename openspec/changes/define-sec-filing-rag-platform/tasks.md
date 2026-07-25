@@ -1,0 +1,307 @@
+## 1. Stage 0.1 — Reproducible K3s foundation
+
+- [ ] 1.1 Document target topology, namespaces, DNS, storage, environment overlays, prerequisites, and secret bootstrap.
+- [ ] 1.2 Add reproducible K3s, Traefik, namespace, storage, Secret-reference, and ConfigMap manifests.
+- [ ] 1.3 Verify a clean environment can bind a persistent volume and run a disposable internal workload.
+
+## 2. Stage 0.2 — Versioned Hello World applications
+
+- [ ] 2.1 Scaffold independently buildable Next.js/TypeScript/Tailwind and FastAPI/Pydantic applications with modular source layouts.
+- [ ] 2.2 Add live and version API contracts with build-time commit/image identity and contract tests.
+- [ ] 2.3 Build minimal containers and display frontend version, API reachability, and API version from FastAPI.
+
+## 3. Stage 0.3 — Public ingress and TLS
+
+- [ ] 3.1 Configure Traefik HTTPS routes for only the frontend and documented API prefix.
+- [ ] 3.2 Configure certificate issuance, HTTP redirect, host validation, CORS policy, and baseline security headers.
+- [ ] 3.3 Verify HTTPS browser-to-API behavior and prove internal service ports are not publicly reachable.
+
+## 4. Stage 0.4 — Application PostgreSQL persistence
+
+- [ ] 4.1 Select and pin a PostgreSQL image compatible with pgvector and the chosen BM25 extension.
+- [ ] 4.2 Deploy application PostgreSQL with dedicated credentials, service, persistent volume, resource limits, and backup-ready configuration.
+- [ ] 4.3 Add a minimal migration and adapter for deployment-check records using parameterized database access.
+- [ ] 4.4 Verify simple query, extension availability, write/read behavior, and persistence across application and database pod restarts.
+
+## 5. Stage 0.5 — Readiness and safe status
+
+- [ ] 5.1 Implement bounded readiness checks for required application dependencies without coupling liveness to PostgreSQL.
+- [ ] 5.2 Implement a response-modeled infrastructure-status endpoint that redacts topology, credentials, and exception internals.
+- [ ] 5.3 Configure probes and verify unready pods stop receiving traffic and recover when dependencies return.
+
+## 6. Stage 0.6 — Independent Kestra persistence
+
+- [ ] 6.1 Deploy dedicated Kestra PostgreSQL with separate credentials, service, volume, and network exposure.
+- [ ] 6.2 Deploy the pinned official Kestra image against only its dedicated database.
+- [ ] 6.3 Create and execute a minimal validation workflow and verify execution history survives Kestra and database restarts.
+
+## 7. Stage 0.7 — Protected internal workflow connectivity
+
+- [ ] 7.1 Define a versioned internal callback contract and least-privilege workflow authentication mechanism.
+- [ ] 7.2 Implement a protected, rate-limited internal validation endpoint with sanitized logging.
+- [ ] 7.3 Verify valid Kestra invocation, invalid-credential rejection, timeout behavior, correlation, and lack of public exposure.
+
+## 8. Stage 0.8 — Pull-request CI
+
+- [ ] 8.1 Add pinned frontend lint, type, unit, and production-build checks.
+- [ ] 8.2 Add pinned backend lint, type, unit, migration, and dependency-lock checks.
+- [ ] 8.3 Add container builds, manifest rendering/validation, secret scanning, dependency vulnerability checks, and test-result reporting.
+- [ ] 8.4 Prove representative frontend, backend, manifest, and security regressions fail pull-request CI without production secrets.
+
+## 9. Stage 0.9 — Immutable deployment pipeline
+
+- [ ] 9.1 Publish frontend and API images under immutable commit-addressed tags with provenance metadata.
+- [ ] 9.2 Deploy only immutable tags from the protected deployment branch with serialized deployment concurrency.
+- [ ] 9.3 Wait for rollout and run public plus internal smoke tests that fail the pipeline on readiness or version mismatch.
+
+## 10. Stage 0.10 — Rollback and recreation rehearsal
+
+- [ ] 10.1 Document and automate restoration of the last known-good stateless application version.
+- [ ] 10.2 Rehearse an unhealthy release and verify healthy traffic plus persistent records survive restoration.
+- [ ] 10.3 Recreate the environment from version-controlled configuration and documented secret inputs.
+- [ ] 10.4 Run and record the complete Stage 0 acceptance suite.
+
+## 11. Stage 1.1 — Google authentication
+
+- [ ] 11.1 Choose and document the Google OAuth/OIDC session architecture and threat model.
+- [ ] 11.2 Implement verified-email login, stable-subject user resolution, secure session validation, logout, and validated return URLs.
+- [ ] 11.3 Test invalid state/nonce, unverified email, expired session, logout, token redaction, and account return behavior.
+
+## 12. Stage 1.2 — Two-role authorization
+
+- [ ] 12.1 Add application-owned `user` and `admin` roles and an audited initial-admin bootstrap.
+- [ ] 12.2 Implement reusable FastAPI authorization policies and role-gated frontend navigation.
+- [ ] 12.3 Test normal, admin, cross-user, deactivated-user, and role-refresh cases at the API boundary.
+
+## 13. Stage 1.3 — Versioned configuration registry
+
+- [ ] 13.1 Model immutable logical configuration versions, safe snapshots, active pointers, creator metadata, and secret references.
+- [ ] 13.2 Add migrations, repository ports, transactional active-version selection, and lookup APIs.
+- [ ] 13.3 Test that changes create new versions and historical versions remain unchanged and secret-free.
+
+## 14. Stage 1.4 — Minimal production schema and seeded filing
+
+- [ ] 14.1 Model companies, filings, collections, corpus builds, sections, chunk sets, chunks, embeddings, and citation lineage.
+- [ ] 14.2 Add reversible migrations, constraints, readiness transitions, and idempotent repository operations.
+- [ ] 14.3 Build a repeatable import for one approved 10-K with extraction, corpus, chunking, and source metadata.
+- [ ] 14.4 Validate corpus completeness, legitimate item absence, duplicate import handling, and filing-to-chunk traceability.
+
+## 15. Stage 1.5 — One retrieval path
+
+- [ ] 15.1 Define normalized retriever and result contracts independent of SQLAlchemy and provider types.
+- [ ] 15.2 Implement the initial vector retriever with allowlisted filters, version compatibility, controlled top-k, and parameterized queries.
+- [ ] 15.3 Expose validated ticker, filing, section, and question query contracts with request and pagination limits.
+- [ ] 15.4 Test ranked retrieval, unsupported/ambiguous ticker, invalid filters, incompatible embedding versions, and tenant isolation.
+
+## 16. Stage 1.6 — Grounded answer and citations
+
+- [ ] 16.1 Implement context limits, source delimiting, stable citation handles, and prompt-injection-aware context construction.
+- [ ] 16.2 Implement the centralized gateway port and one allowlisted generation-provider adapter with timeouts, retries, and normalized errors.
+- [ ] 16.3 Add a versioned grounded-answer prompt and structured citation validation.
+- [ ] 16.4 Test supported, insufficient-evidence, invalid-citation, provider-failure, unsafe-content-rendering, and financial-advice cases.
+
+## 17. Stage 1.7 — Experiment persistence
+
+- [ ] 17.1 Model immutable query executions, retrieved-result snapshots, answers, citations, configuration references, failures, and traces.
+- [ ] 17.2 Persist successful and failed runs transactionally without mutating historical executions.
+- [ ] 17.3 Implement user-scoped history/detail and admin-scoped inspection contracts with filters and controlled sorting.
+- [ ] 17.4 Test historical rendering after configuration changes and cross-user access denial.
+
+## 18. Stage 1.8 — Usage cost and basic budgets
+
+- [ ] 18.1 Model immutable pricing, usage/cost ledger entries, budgets, reservations, decisions, and reconciliation.
+- [ ] 18.2 Route generation usage through atomic global and per-experiment/job reservation and reconciliation.
+- [ ] 18.3 Implement explicit block and configured-fallback results without silent substitution.
+- [ ] 18.4 Test concurrent near-limit calls, provider failure, underestimated usage, expired reservation recovery, and ledger reconciliation.
+
+## 19. Stage 1.9 — Walking-skeleton Tailwind UI
+
+- [ ] 19.1 Build the responsive authenticated shell with Ask, History, Jobs, Usage, user controls, and role-gated Admin navigation.
+- [ ] 19.2 Build the analyst-focused query form with ticker resolution, latest-10-K scope, multiline question, and collapsed Advanced Settings.
+- [ ] 19.3 Build cited answer, source-card, collapsed run-detail, feedback, evaluation, comparison, and bookmark controls.
+- [ ] 19.4 Add accessible loading, empty, validation, insufficient-evidence, and error states with safe text rendering.
+- [ ] 19.5 Verify the end-to-end login, seeded query, citation, cost, and history flow on desktop and mobile.
+
+## 20. Stage 2.1 — Filing discovery and EDGAR policy
+
+- [ ] 20.1 Define authoritative ticker/CIK resolution, latest-filing selection, accession validation, and legitimate-section-absence policy.
+- [ ] 20.2 Implement an SSRF-resistant, rate-limited SEC adapter with fixed endpoints, HTTPS, timeouts, response limits, and compliant User-Agent construction.
+- [ ] 20.3 Implement trigger-dependent contact selection, verified-email disclosure, actor audit, encrypted/access-controlled persistence, and structured redaction.
+- [ ] 20.4 Test user, schedule, admin backfill, retry, ambiguous security, unsafe identifier, and contact-leakage cases.
+
+## 21. Stage 2.2 — Deterministic single-filing ingestion
+
+- [ ] 21.1 Implement idempotent download and source-integrity recording for one explicit accession.
+- [ ] 21.2 Implement versioned selected-item extraction and normalization with safe parser limits.
+- [ ] 21.3 Implement chunking, gateway-based embeddings, BM25/vector indexing, and immutable lineage.
+- [ ] 21.4 Implement completeness validation and atomic readiness publication while retaining the prior ready build.
+- [ ] 21.5 Test retries and failures at every stage, legitimate absent items, duplicate inputs, malformed documents, and partial-build invisibility.
+
+## 22. Stage 2.3 — Application job state machine
+
+- [ ] 22.1 Model application jobs, attempts, stable stages, progress, trigger provenance, workflow reference, errors, cost, and budget state.
+- [ ] 22.2 Define versioned Kestra start and callback contracts with idempotency keys and authenticated callbacks.
+- [ ] 22.3 Enforce valid transactional state transitions and repeated/out-of-order callback handling.
+- [ ] 22.4 Test durable REST state across browser, API, Kestra, and database restarts.
+
+## 23. Stage 2.4 — Manual admin ingestion
+
+- [ ] 23.1 Add validated admin filing-target preview and manual-ingestion start operations.
+- [ ] 23.2 Add audited inspect, retry, cancel, and re-run actions with safe state guards.
+- [ ] 23.3 Test user denial, terminal/retriable handling, idempotent retries, and cancellation propagation.
+
+## 24. Stage 2.5 — On-demand ingestion
+
+- [ ] 24.1 Model private ingestion requests and durable pending query executions separately from shared jobs.
+- [ ] 24.2 Create or join ingestion from a missing-filing query after authorization, quota, consent, and budget checks.
+- [ ] 24.3 Persist the original resolved inputs and cancellation/expiration state without holding the HTTP request open.
+- [ ] 24.4 Test ready, missing, quota-blocked, budget-blocked, cancelled, and browser-departure paths.
+
+## 25. Stage 2.6 — Deduplication and concurrency
+
+- [ ] 25.1 Define the compatibility key for filing, corpus, extraction, chunking, embedding, and index versions.
+- [ ] 25.2 Enforce one active compatible job with transactional uniqueness or locking and separately associate every request.
+- [ ] 25.3 Define scheduled/on-demand collision, ownership, cost attribution, detachment, retry, and admin-cancellation rules.
+- [ ] 25.4 Run concurrency tests proving one workflow, immutable EDGAR provenance, isolated requests, and recoverable retry.
+
+## 26. Stage 2.7 — SSE progress and reconnect
+
+- [ ] 26.1 Define versioned, public-safe SSE event schemas, authorization, heartbeats, cursor/reconciliation, and terminal events.
+- [ ] 26.2 Implement persistent job retrieval and streaming without exposing raw Kestra payloads or contact identity.
+- [ ] 26.3 Build in-place Tailwind progress, elapsed time, cost state, leave/return, retry, and role-appropriate failure details.
+- [ ] 26.4 Test disconnect/reconnect, logout/return, shared-job visibility, terminal completion, and cross-user leakage.
+
+## 27. Stage 2.8 — Automatic query continuation
+
+- [ ] 27.1 Claim eligible pending queries transactionally when a corpus build becomes ready.
+- [ ] 27.2 Revalidate user status, authorization, configuration, quota, and budget before retrieval or generation.
+- [ ] 27.3 Transition the UI from readiness to the independently persisted completed or failed experiment.
+- [ ] 27.4 Test duplicate ready events, cancelled/expired requests, user deactivation, insufficient budget, and at-most-once execution.
+
+## 28. Stage 2.9 — Scheduled ingestion
+
+- [ ] 28.1 Model audited, versioned scheduled ticker configuration with enabled state, filing type, cadence, and history depth.
+- [ ] 28.2 Implement Kestra discovery using operational identity and application APIs rather than direct business-table writes.
+- [ ] 28.3 Apply ready-build skipping, deduplication, overlap handling, and admin-visible failure state.
+- [ ] 28.4 Test new filing, no change, overlapping schedule, disabled ticker, and discovery failure.
+
+## 29. Stage 2.10 — Ingestion history and cost
+
+- [ ] 29.1 Build user-scoped job history and detail with ticker, trigger, status, progress, timestamps, and authorized cost.
+- [ ] 29.2 Build minimal admin scheduled-ticker and job pages with audited actions and workflow references.
+- [ ] 29.3 Record and reconcile download, extraction, embedding, indexing, workflow, and retry costs without leaking contact identity.
+
+## 30. Stage 3.1 — Retriever contract conformance
+
+- [ ] 30.1 Create shared contract fixtures and conformance tests for metadata, scores, citations, filtering, limits, and errors.
+- [ ] 30.2 Ensure query, context, and experiment modules depend only on the normalized retriever port.
+
+## 31. Stage 3.2 — PostgreSQL BM25
+
+- [ ] 31.1 Add versioned BM25 index migrations and operational restore/rebuild procedures.
+- [ ] 31.2 Implement BM25 retrieval with validated query input and recorded extension/configuration versions.
+- [ ] 31.3 Validate exact-term fixtures, score persistence, index upgrades, restore behavior, and safe failure when unavailable.
+
+## 32. Stage 3.3 — Vector strategy formalization
+
+- [ ] 32.1 Version distance metric, embedding compatibility, index parameters, top-k, and metadata filters.
+- [ ] 32.2 Add deterministic vector retrieval fixtures and explainable advanced score display.
+
+## 33. Stage 3.4 — Deterministic hybrid retrieval
+
+- [ ] 33.1 Implement versioned reciprocal-rank fusion with controlled candidates and deterministic tie-breaking.
+- [ ] 33.2 Persist component ranks/scores and final ordering without adding a hidden reranker call.
+- [ ] 33.3 Test repeated results, ties, missing component candidates, and bounded resource use.
+
+## 34. Stage 3.5 — Strategy selection
+
+- [ ] 34.1 Register enabled retriever configurations and enforce user/admin allowlists in FastAPI.
+- [ ] 34.2 Add readable BM25, Vector, and Hybrid controls in Advanced Settings with Hybrid as the documented default.
+- [ ] 34.3 Verify an ordinary query executes exactly one selected strategy.
+
+## 35. Stage 3.6 — Intentional comparison
+
+- [ ] 35.1 Model comparison parents and independently executable child experiments.
+- [ ] 35.2 Estimate and authorize aggregate selected-strategy cost before starting comparison.
+- [ ] 35.3 Execute only selected strategies and retain partial success with per-child errors.
+
+## 36. Stage 3.7 — Comparison results UI
+
+- [ ] 36.1 Build accessible desktop columns and mobile stacked cards for answers, sources, latency, and categorized cost.
+- [ ] 36.2 Build a normalized metrics table for retrieval, total latency, sources, citation coverage, generation cost, and evaluation cost.
+- [ ] 36.3 Show qualitative observations only when a versioned evaluator supplies supporting evidence.
+- [ ] 36.4 Test historical comparison reproduction, partial failures, responsive layout, and absence of automatic universal winners.
+
+## 37. Stage 4.1 — Deterministic Quick evaluation
+
+- [ ] 37.1 Implement versioned citation coverage, missing-citation, context-availability, answer-length, and operational checks.
+- [ ] 37.2 Verify Quick performs no model call and persists results independently.
+
+## 38. Stage 4.2 — Standard evaluation
+
+- [ ] 38.1 Add a versioned evaluator prompt, allowlisted model, structured result, and independent lifecycle.
+- [ ] 38.2 Route evaluation through gateway budgets, usage, cost, timeouts, and normalized errors.
+- [ ] 38.3 Verify evaluation failure never changes the original answer's completion state.
+
+## 39. Stage 4.3 — Evaluation profile policy
+
+- [ ] 39.1 Model immutable `none`, `quick`, `standard`, and `benchmark` definitions and active policies.
+- [ ] 39.2 Enforce user allowlists, sampling configuration, evaluation quotas, and explicit invocation records.
+- [ ] 39.3 Add permitted query-page controls while keeping Benchmark in admin/experiment workflows.
+
+## 40. Stage 4.4 — Benchmark dataset
+
+- [ ] 40.1 Model immutable benchmark datasets, cases, filing/corpus scope, expected evidence, and rubrics.
+- [ ] 40.2 Add validated import/export with access controls and referential integrity.
+- [ ] 40.3 Publish a representative initial dataset and lock its version.
+
+## 41. Stage 4.5 — Kestra benchmark workflow
+
+- [ ] 41.1 Model application-owned benchmark jobs, case executions, progress, partial results, and budgets.
+- [ ] 41.2 Coordinate bounded benchmark execution through authenticated versioned Kestra contracts.
+- [ ] 41.3 Test retry without duplicate cases, partial persistence, cancellation, budget exhaustion, and progress.
+
+## 42. Stage 4.6 — Scoped budget hierarchy
+
+- [ ] 42.1 Add global, provider, model, category, job, user, and experiment budget scopes with period, currency, and precedence rules.
+- [ ] 42.2 Extend atomic reservation/reconciliation across ingestion, embedding, generation, evaluation, and comparison.
+- [ ] 42.3 Implement pause, block, expiry recovery, and explicit configured fallback workflows.
+- [ ] 42.4 Stress-test concurrency, nested limits, retries, stale reservations, and ledger reconciliation.
+
+## 43. Stage 4.7 — User cost views
+
+- [ ] 43.1 Build monthly query/job counts, separated category costs, total, limit, used, and remaining summaries.
+- [ ] 43.2 Document and display the shared-ingestion attribution rule and distinguish estimated, reserved, and final cost.
+- [ ] 43.3 Verify user isolation and exact reconciliation to authorized ledger entries.
+
+## 44. Stage 4.8 — Administrative governance
+
+- [ ] 44.1 Build the minimal admin dashboard for service health, active/failed jobs, indexed filings, spend, warnings, and recent failures.
+- [ ] 44.2 Build audited budget and model configuration pages with versioned pricing, defaults, allowlists, and fallback rules.
+- [ ] 44.3 Build user and role management with rate controls and protected operational detail.
+- [ ] 44.4 Verify admin totals reconcile and historical costs do not change after pricing updates.
+
+## 45. MVP acceptance
+
+- [ ] 45.1 Run the authenticated query, missing-filing ingestion, reconnect, cited answer, history, usage, comparison, and evaluation user journeys.
+- [ ] 45.2 Run scheduled-ticker, job management, model/strategy, benchmark, budget, user, and platform-cost admin journeys.
+- [ ] 45.3 Complete authorization, validation, XSS, injection, SSRF, rate/quota, secret-redaction, cost-concurrency, persistence, rollback, and public-exposure testing.
+- [ ] 45.4 Document operations, backup/restore, retention, incident response, SEC identity disclosure, known availability limits, and production acceptance.
+
+## 46. Stage 5 — Corpus expansion
+
+- [ ] 46.1 Define and test a collection adapter contract for taxonomy, extraction, completeness, citation, ingestion, and query scope.
+- [ ] 46.2 Add remaining 10-K sections as a new immutable corpus version without changing historical experiments.
+- [ ] 46.3 Add Form 10-Q discovery, extraction, completeness, citation, retrieval, and evaluation fixtures.
+- [ ] 46.4 Add Form 8-K event/item semantics and explicit multi-filing scope.
+- [ ] 46.5 Add reproducible cross-period and cross-filing selection, context balancing, citation grouping, and cost control.
+- [ ] 46.6 Add an approval and provenance process for each non-SEC collection before query enablement.
+
+## 47. Stage 6 — Agentic expansion
+
+- [ ] 47.1 Define an execution-strategy contract and adapt `direct_rag` without changing behavior.
+- [ ] 47.2 Define read-only, least-privilege agent tools with input schemas, authorization propagation, audit, iteration limits, and gateway-only model access.
+- [ ] 47.3 Implement one bounded agentic strategy with explicit user selection, traceability, citation enforcement, and terminal failure states.
+- [ ] 47.4 Implement direct-versus-agentic comparison over aligned question, filing, corpus, model-policy, metric, and evaluation scopes.
+- [ ] 47.5 Add framework adapters one at a time without bypassing authorization, gateway, budget, experiment, or tool policies.
+- [ ] 47.6 Benchmark step count, tools, retries, quality, latency, and agent cost with explicit budget-exhaustion outcomes.
