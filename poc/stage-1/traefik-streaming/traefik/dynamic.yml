@@ -1,0 +1,41 @@
+http:
+  routers:
+    api-stream:
+      entryPoints: [websecure]
+      rule: Host(`poc.localhost`) && Path(`/api/events`)
+      priority: 200
+      middlewares: [streaming-headers]
+      service: api
+      tls: {}
+    api:
+      entryPoints: [websecure]
+      rule: Host(`poc.localhost`) && PathPrefix(`/api`)
+      priority: 100
+      middlewares: [api-limit]
+      service: api
+      tls: {}
+    frontend:
+      entryPoints: [websecure]
+      rule: Host(`poc.localhost`)
+      priority: 10
+      middlewares: [frontend-limit]
+      service: frontend
+      tls: {}
+  middlewares:
+    api-limit:
+      buffering: {maxRequestBodyBytes: 1024}
+    frontend-limit:
+      buffering: {maxRequestBodyBytes: 1024}
+    streaming-headers:
+      headers:
+        customResponseHeaders:
+          X-Accel-Buffering: "no"
+          Cache-Control: "no-cache"
+  services:
+    api:
+      loadBalancer:
+        responseForwarding: {flushInterval: -1ms}
+        servers: [{url: "http://api:8080"}]
+    frontend:
+      loadBalancer:
+        servers: [{url: "http://frontend:8080"}]

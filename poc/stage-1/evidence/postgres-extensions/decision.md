@@ -38,8 +38,9 @@ the Stage 1 resource-envelope PoC runs on the selected deployment host.
 
 ## Follow-up
 
-Complete the missing memory and index-size measurements before closing Stage
-1.2. If amd64 becomes the selected deployment host, verify the official PG18
+Stage 1.2 is closed by owner decision. Capture the missing memory and index-size
+measurements in the combined Stage 1.7 resource envelope before approving a
+Stage 2 node size. If amd64 becomes the selected deployment host, verify the official PG18
 amd64 `pg_textsearch` artifact and resolved image digest during image delivery;
 this is a portability confirmation rather than a blocker to the current ARM64
 functional milestone.

@@ -6,28 +6,28 @@
 
 ## 2. Stage 1.2 — PostgreSQL 18 extension stack PoC
 
-- [ ] 2.1 Build a disposable PostgreSQL 18 image with pinned pgvector and trial `pg_textsearch` versions for the target CPU architecture.
-- [ ] 2.2 Load representative SEC-style chunks and prove vector, BM25, and ticker, CIK, form, fiscal-period, item, filing, and corpus-build filters can coexist.
-- [ ] 2.3 Verify parameterized invalid-input handling, expected query plans, extension version discovery, restart persistence, and understood index rebuild and upgrade procedures.
-- [ ] 2.4 Record image size, build and startup time, memory, index size, representative latency, and the decision to accept `pg_textsearch` or select a retriever-port-compatible alternative.
+- [x] 2.1 Build a disposable PostgreSQL 18 image with pinned pgvector and trial `pg_textsearch` versions for the target CPU architecture.
+- [x] 2.2 Load representative SEC-style chunks and prove vector, BM25, and ticker, CIK, form, fiscal-period, item, filing, and corpus-build filters can coexist.
+- [x] 2.3 Verify parameterized invalid-input handling, expected query plans, extension version discovery, restart persistence, and understood index rebuild and upgrade procedures.
+- [x] 2.4 Record image size, build and startup time, memory, index size, representative latency, and the decision to accept `pg_textsearch` or select a retriever-port-compatible alternative. Closed by owner with memory and index-size measurements deferred to Stage 1.7.
 
 ## 3. Stage 1.3 — Kestra database compatibility PoC
 
-- [ ] 3.1 Run a pinned official Kestra image against a dedicated PostgreSQL 18 candidate using disposable storage and least-privilege credentials.
-- [ ] 3.2 Execute a minimal workflow and verify execution history across application and database restarts.
-- [ ] 3.3 Record compatibility, resource use, required configuration, and whether Kestra must use a separately pinned supported PostgreSQL version.
+- [x] 3.1 Skipped by owner decision; Kestra/PostgreSQL compatibility remains unvalidated.
+- [x] 3.2 Skipped by owner decision; restart persistence remains unvalidated.
+- [x] 3.3 Skipped by owner decision; Stage 2 must select and validate a supported Kestra database pin.
 
 ## 4. Stage 1.4 — K3s storage PoC
 
-- [ ] 4.1 Prove the intended host and storage class satisfy PostgreSQL ownership, permissions, access-mode, capacity, and local-volume scheduling assumptions.
-- [ ] 4.2 Verify data survives pod replacement and database restart while explicitly excluding host and volume disaster recovery.
-- [ ] 4.3 Record storage constraints and the approved Stage 2 persistent-volume pattern.
+- [x] 4.1 Skipped by owner decision; target-host storage behavior remains unvalidated.
+- [x] 4.2 Skipped by owner decision; pod-replacement and restart persistence remain unvalidated.
+- [x] 4.3 Skipped by owner decision; Stage 2 must select and validate its persistent-volume pattern.
 
 ## 5. Stage 1.5 — Traefik routing and streaming PoC
 
-- [ ] 5.1 Deploy disposable frontend and API responders through the intended Traefik routing pattern with same-origin `/api`, forwarded-header trust, HTTPS redirect, host validation, and body limits.
-- [ ] 5.2 Prove an SSE stream remains usable through ingress with heartbeats, disconnect, reconnect, buffering controls, and bounded timeouts.
-- [ ] 5.3 Record ingress annotations, proxy trust boundaries, and routing constraints for Stage 2.
+- [x] 5.1 Deploy disposable frontend and API responders through the intended Traefik routing pattern with same-origin `/api`, forwarded-header trust, HTTPS redirect, host validation, and body limits.
+- [x] 5.2 Prove an SSE stream remains usable through ingress with heartbeats, disconnect, reconnect, buffering controls, and bounded timeouts.
+- [x] 5.3 Record ingress annotations, proxy trust boundaries, and routing constraints for Stage 2.
 
 ## 6. Stage 1.6 — Image delivery and CI connectivity PoC
 

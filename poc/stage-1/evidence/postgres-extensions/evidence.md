@@ -2,13 +2,13 @@
 
 ## Metadata
 
-- Status: `functional compatibility milestone accepted with architecture constraint`
+- Status: `reviewed and closed with owner-approved constraints`
 - Owner: repository maintainer
 - Reviewer: pending
 - Started at (UTC): 2026-07-25
 - Completed at (UTC): 2026-07-25T20:36:37Z (ARM64 preflight only)
 - Repository base commit: `1ee7772ff344ee2d530eb83af93b423d6efd48e7`
-- Evidence state: implementation and evidence changes are uncommitted
+- Evidence state: committed in `6fcaffa`; closure constraints recorded separately
 - Host architecture: `aarch64`
 - Deployment platforms: `linux/arm64` validated; `linux/amd64` provisionally assumed compatible
 - Execution mode: `native arm64`; amd64 not measured
@@ -163,6 +163,9 @@ Compose volume, network, container, credential, or application resource.
   and the corrected persistence test passed against the already-restarted data.
 - The 120-row latency sample is too small for performance acceptance. No ARM64
   timing or image digest may be represented as measured amd64 evidence.
+- Memory and index-size measurements were not captured. The owner closed Stage
+  1.2 with this gap explicitly deferred to the combined Stage 1.7 resource
+  envelope; Stage 2 must not infer resource limits from this PoC.
 
 ## Evidence references
 

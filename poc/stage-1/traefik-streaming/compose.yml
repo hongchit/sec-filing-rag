@@ -1,0 +1,60 @@
+name: sec-filing-rag-poc-traefik-streaming
+services:
+  traefik:
+    image: traefik:v3.7.1@sha256:72ed9e98f2395fca5a9e1c67e131910c21ff06e694955da8e0eae0e5206fc27b
+    platform: linux/amd64
+    command:
+      - --api.dashboard=false
+      - --ping=true
+      - --ping.entrypoint=web
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --providers.file.watch=false
+      - --entrypoints.web.address=:8080
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:8443
+      - --entrypoints.websecure.forwardedheaders.trustedips=127.0.0.1/32,::1/128
+      - --entrypoints.websecure.transport.respondingtimeouts.readtimeout=15s
+      - --entrypoints.websecure.transport.respondingtimeouts.writetimeout=15s
+      - --entrypoints.websecure.transport.respondingtimeouts.idletimeout=30s
+      - --accesslog=true
+    ports:
+      - 127.0.0.1:18080:8080
+      - 127.0.0.1:18443:8443
+    volumes:
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    networks: [edge, ingress]
+    depends_on:
+      frontend: {condition: service_healthy}
+      api: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, traefik, healthcheck, --ping]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  frontend:
+    image: python:3.13.5-alpine@sha256:f1a962d8ffa50b2006b72b4713a09a89e57def2d28ac28a36900bc070a00db61
+    platform: linux/amd64
+    command: [python, /poc/responder.py, frontend]
+    volumes:
+      - ./responders/responder.py:/poc/responder.py:ro
+    expose: ["8080"]
+    networks: [ingress]
+    healthcheck: &responder-health
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/health]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  api:
+    image: python:3.13.5-alpine@sha256:f1a962d8ffa50b2006b72b4713a09a89e57def2d28ac28a36900bc070a00db61
+    platform: linux/amd64
+    command: [python, /poc/responder.py, api]
+    volumes:
+      - ./responders/responder.py:/poc/responder.py:ro
+    expose: ["8080"]
+    networks: [ingress]
+    healthcheck: *responder-health
+networks:
+  edge: {}
+  ingress:
+    internal: true

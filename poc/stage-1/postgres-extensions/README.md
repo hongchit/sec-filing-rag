@@ -41,5 +41,5 @@ belong in `../evidence/postgres-extensions/evidence.md`.
 ARM64 is an acceptable deployment architecture and this run establishes the
 functional-compatibility milestone. amd64 compatibility is provisionally
 assumed but unmeasured; architecture-specific artifacts and digests must still
-be verified if amd64 is selected. Stage 1.2 remains open until its required
-memory and index-size evidence is recorded.
+be verified if amd64 is selected. Stage 1.2 was closed by owner decision with
+memory and index-size measurements explicitly deferred to Stage 1.7.
