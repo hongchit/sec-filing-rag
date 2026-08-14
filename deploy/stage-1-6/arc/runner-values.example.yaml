@@ -1,0 +1,33 @@
+# Copy this file outside Git and replace the repository URL before installing.
+# The referenced Secret is created out of band; never add its value here.
+githubConfigUrl: https://github.com/REPLACE_OWNER/REPLACE_REPOSITORY
+githubConfigSecret: arc-github-auth
+
+runnerScaleSetName: sec-filing-rag-deploy
+minRunners: 0
+maxRunners: 1
+
+template:
+  spec:
+    serviceAccountName: sec-filing-rag-deploy-runner
+    automountServiceAccountToken: true
+    restartPolicy: Never
+    securityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:2.334.0@sha256:91a87fc7ecea714252b01a1a3f0c64d0f8fe6a05fd466a631b9a51f88f4c7aca
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 768Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]

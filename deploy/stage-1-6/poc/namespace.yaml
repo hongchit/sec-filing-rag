@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: project-sec-filing-rag-poc
+  labels:
+    app.kubernetes.io/part-of: sec-filing-rag
+    sec-filing-rag.henrychan.dev/lifecycle: disposable
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-bounds
+  namespace: project-sec-filing-rag-poc
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 25m
+        memory: 32Mi
+      default:
+        cpu: 100m
+        memory: 64Mi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: project-quota
+  namespace: project-sec-filing-rag-poc
+spec:
+  hard:
+    requests.cpu: 250m
+    requests.memory: 256Mi
+    limits.cpu: 500m
+    limits.memory: 512Mi
+    pods: "4"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sec-filing-rag-probe
+  namespace: project-sec-filing-rag-poc
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sec-filing-rag-workload-deployer
+  namespace: project-sec-filing-rag-poc
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sec-filing-rag-workload-deployer
+  namespace: project-sec-filing-rag-poc
+subjects:
+  - kind: ServiceAccount
+    name: sec-filing-rag-deploy-runner
+    namespace: arc-runners-sec-filing-rag
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sec-filing-rag-workload-deployer

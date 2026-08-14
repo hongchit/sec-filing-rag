@@ -1,0 +1,190 @@
+name: Stage 1.6 manual deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_revision:
+        description: Full 40-character commit SHA already published by the image workflow
+        required: true
+        type: string
+      target:
+        description: Namespace target; configure matching GitHub environment approval
+        required: true
+        type: choice
+        options:
+          - poc
+          - persistent
+      rehearse_failure:
+        description: Prove a bad image fails and the accepted digest is restored
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage-1-6-image-delivery
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Resolve the existing amd64 digest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      registry_digest: ${{ steps.resolve.outputs.registry_digest }}
+      deploy_digest: ${{ steps.resolve.outputs.deploy_digest }}
+      image_name: ${{ steps.identity.outputs.image_name }}
+    steps:
+      - name: Derive the published commit identity
+        id: identity
+        env:
+          IMAGE_REVISION: ${{ inputs.image_revision }}
+          TARGET: ${{ inputs.target }}
+          REHEARSE_FAILURE: ${{ inputs.rehearse_failure }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE_REVISION" =~ ^[0-9a-f]{40}$ ]]
+          if [[ "$TARGET" == persistent && "$REHEARSE_FAILURE" == true ]]; then
+            echo 'Failure rehearsal is permitted only in the disposable PoC namespace' >&2
+            exit 1
+          fi
+          owner=${GITHUB_REPOSITORY_OWNER,,}
+          printf 'image_name=ghcr.io/%s/sec-filing-rag-probe\n' "$owner" >> "$GITHUB_OUTPUT"
+          printf 'image_version=sha-%s\n' "$IMAGE_REVISION" >> "$GITHUB_OUTPUT"
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      - name: Authenticate read-only to GHCR
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve registry and amd64 deployment digests without rebuilding
+        id: resolve
+        env:
+          IMAGE_NAME: ${{ steps.identity.outputs.image_name }}
+          IMAGE_VERSION: ${{ steps.identity.outputs.image_version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ref="${IMAGE_NAME}:${IMAGE_VERSION}"
+          registry_digest=$(docker buildx imagetools inspect "$ref" \
+            | awk '$1 == "Digest:" {print $2; exit}')
+          [[ "$registry_digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          raw=$(docker buildx imagetools inspect --raw "$ref")
+          deploy_digest=$(jq -r \
+            '[.manifests[]? | select(.platform.os == "linux" and .platform.architecture == "amd64")][0].digest // empty' \
+            <<< "$raw")
+          [[ -n "$deploy_digest" ]] || deploy_digest=$registry_digest
+          [[ "$deploy_digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          printf 'registry_digest=%s\n' "$registry_digest" >> "$GITHUB_OUTPUT"
+          printf 'deploy_digest=%s\n' "$deploy_digest" >> "$GITHUB_OUTPUT"
+          printf 'Resolved existing %s@%s; amd64 deployment digest %s\n' \
+            "$IMAGE_NAME" "$registry_digest" "$deploy_digest"
+
+  deploy:
+    name: Manually approved digest deployment
+    needs: resolve
+    runs-on: sec-filing-rag-deploy
+    environment: stage-1-6-${{ inputs.target }}
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install the operator-pinned kubectl
+        env:
+          KUBECTL_VERSION: ${{ vars.KUBECTL_VERSION }}
+          KUBECTL_SHA256_AMD64: ${{ vars.KUBECTL_SHA256_AMD64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$(uname -m)" == x86_64 ]]
+          [[ "$KUBECTL_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$KUBECTL_SHA256_AMD64" =~ ^[0-9a-f]{64}$ ]]
+          install_dir="$RUNNER_TEMP/bin"
+          mkdir -p "$install_dir"
+          curl --fail --silent --show-error --location \
+            "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" \
+            --output "$install_dir/kubectl"
+          printf '%s  %s\n' "$KUBECTL_SHA256_AMD64" "$install_dir/kubectl" | sha256sum --check
+          chmod 0755 "$install_dir/kubectl"
+          printf '%s\n' "$install_dir" >> "$GITHUB_PATH"
+      - name: Verify namespace and least privilege
+        env:
+          TARGET: ${{ inputs.target }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$TARGET" == poc ]]; then
+            namespace=project-sec-filing-rag-poc
+          else
+            namespace=project-sec-filing-rag
+          fi
+          kubectl get namespace "$namespace"
+          kubectl auth can-i patch deployments.apps --namespace "$namespace" | grep -Fx yes
+          kubectl auth can-i get secrets --namespace "$namespace" | grep -Fx no
+          kubectl auth can-i create rolebindings.rbac.authorization.k8s.io --namespace "$namespace" | grep -Fx no
+          kubectl auth can-i list nodes | grep -Fx no
+          kubectl auth can-i get pods --namespace default | grep -Fx no
+      - name: Apply only the accepted immutable amd64 digest
+        env:
+          IMAGE_DIGEST: ${{ needs.resolve.outputs.deploy_digest }}
+          IMAGE_NAME: ${{ needs.resolve.outputs.image_name }}
+          TARGET: ${{ inputs.target }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]
+          [[ "$IMAGE_NAME" =~ ^ghcr\.io/[a-z0-9._-]+/sec-filing-rag-probe$ ]]
+          overlay="$RUNNER_TEMP/stage-1-6-$TARGET"
+          cp -R "deploy/stage-1-6/$TARGET/app" "$overlay"
+          sed -i \
+            -e "s|ghcr.io/replace-owner/sec-filing-rag-probe|${IMAGE_NAME}|" \
+            -e "s|sha256:0000000000000000000000000000000000000000000000000000000000000000|${IMAGE_DIGEST}|" \
+            "$overlay/kustomization.yaml"
+          kubectl kustomize "$overlay" | kubectl apply -f -
+          namespace=project-sec-filing-rag
+          [[ "$TARGET" == poc ]] && namespace=project-sec-filing-rag-poc
+          kubectl rollout status deployment/sec-filing-rag-probe \
+            --namespace "$namespace" --timeout=120s
+          image_id=$(kubectl get pod --namespace "$namespace" \
+            -l app.kubernetes.io/name=sec-filing-rag-probe \
+            -o jsonpath='{.items[0].status.containerStatuses[0].imageID}')
+          [[ "$image_id" == *"$IMAGE_DIGEST" ]]
+          curl --fail --silent --show-error \
+            "http://sec-filing-rag-probe.${namespace}.svc.cluster.local:8080/version"
+      - name: Rehearse failed rollout and restore the accepted digest
+        if: inputs.rehearse_failure && inputs.target == 'poc'
+        env:
+          IMAGE_DIGEST: ${{ needs.resolve.outputs.deploy_digest }}
+          IMAGE_NAME: ${{ needs.resolve.outputs.image_name }}
+          TARGET: ${{ inputs.target }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          namespace=project-sec-filing-rag
+          [[ "$TARGET" == poc ]] && namespace=project-sec-filing-rag-poc
+          bad_digest=sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+          kubectl set image deployment/sec-filing-rag-probe \
+            "probe=${IMAGE_NAME}@${bad_digest}" --namespace "$namespace"
+          if kubectl rollout status deployment/sec-filing-rag-probe \
+            --namespace "$namespace" --timeout=45s; then
+            echo 'ERROR: deliberately invalid digest unexpectedly became ready' >&2
+            exit 1
+          fi
+          kubectl set image deployment/sec-filing-rag-probe \
+            "probe=${IMAGE_NAME}@${IMAGE_DIGEST}" --namespace "$namespace"
+          kubectl rollout status deployment/sec-filing-rag-probe \
+            --namespace "$namespace" --timeout=120s
+      - name: Public Cloudflare smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error https://sec-filing-rag.henrychan.dev/healthz \
+            | grep -Fx '{"status":"ok"}'

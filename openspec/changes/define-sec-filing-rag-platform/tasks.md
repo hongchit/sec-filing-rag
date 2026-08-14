@@ -31,13 +31,13 @@
 
 ## 6. Stage 1.6 — Image delivery and CI connectivity PoC
 
-- [ ] 6.1 Build a minimal target-architecture image, publish it under an immutable digest-addressable tag, and pull it from the intended registry using scoped credentials.
-- [ ] 6.2 Prove the selected GitHub Actions runner can authenticate and deploy to a disposable K3s namespace without publicly exposing the Kubernetes API.
-- [ ] 6.3 Record registry, runner, credential, network, provenance, and deployment-branch decisions for Stage 2.
+- [ ] 6.1 Build and locally validate the non-root Python probe natively as `linux/arm64`, publish its `linux/amd64` VPS build to private GHCR under a full-commit tag with SBOM/provenance, and prove anonymous denial plus namespace-scoped authenticated pull by immutable digest.
+- [ ] 6.2 Install pinned repository-scoped ARC with zero-to-one ephemeral deploy runners, prove namespaced deployment and denial boundaries in `project-sec-filing-rag-poc` without public Kubernetes API exposure, rehearse restoration, and clean up the PoC namespace.
+- [ ] 6.3 Record registry, runner, credentials, network, provenance, deployment-branch, resource, and cleanup decisions; then deploy the accepted digest through independent manifests into `project-sec-filing-rag` as the static non-production demo.
 
 ## 7. Stage 1.7 — Resource envelope and foundation gate
 
-- [ ] 7.1 Measure combined idle, startup, and representative-load CPU, memory, disk, and restart behavior for the approved database, Kestra, ingress, and minimal application candidates.
+- [ ] 7.1 Measure combined idle, startup, and representative-load CPU, memory, disk, and restart behavior for the approved database, Kestra, ingress, minimal application candidates, ARC controller/listener idle state, and one active ephemeral runner.
 - [ ] 7.2 Decide the minimum K3s node envelope and whether internal Prometheus and Grafana provide sufficient value within that envelope.
 - [ ] 7.3 Review every PoC decision and block Stage 2 until all foundation-changing failures have an accepted constraint or replacement.
 - [ ] 7.4 Publish the Stage 1 evidence summary and explicit go or no-go decision for the separate Stage 2 foundation change.

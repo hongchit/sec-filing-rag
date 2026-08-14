@@ -7,6 +7,34 @@ Before foundation implementation begins, the platform SHALL complete disposable 
 - **WHEN** the pre-foundation proofs complete
 - **THEN** their pinned inputs, reproducible procedure, measured evidence, limitations, and accept, constrain, replace, or defer decisions are recorded before Stage 2 manifests are implemented
 
+### Requirement: Private immutable image-delivery proof
+The image-delivery proof SHALL validate the probe locally as native `linux/arm64`, publish a non-root `linux/amd64` probe image for the x86_64 VPS to private GHCR under a full-commit tag, deploy it only by registry digest, pull it with a namespace-local read-only credential, and record the multi-platform base index, resolved child manifests, OCI provenance, and SBOM metadata.
+
+#### Scenario: Scoped private pull
+- **WHEN** the disposable K3s workload starts
+- **THEN** an anonymous pull is rejected, the namespace-scoped credential succeeds, and the running image identity matches the recorded GHCR digest
+
+### Requirement: Private outbound-only deployment connectivity
+The CI-connectivity proof SHALL use a repository-scoped ARC scale set with zero idle runners and at most one ephemeral runner that reaches GitHub over outbound HTTPS and has workload permissions only in the selected project namespace.
+
+#### Scenario: Deployment boundary
+- **WHEN** the protected manual deployment workflow runs
+- **THEN** it can update and observe the selected Deployment, Service, Ingress, ReplicaSets, and Pods but cannot read Secrets, modify RBAC, access other namespaces, use a Docker socket, or require a publicly reachable Kubernetes API
+
+### Requirement: Disposable proof and independent demo
+Stage 1.6 SHALL delete `project-sec-filing-rag-poc` after evidence capture and MAY then deploy the accepted digest through independently reviewed manifests into `project-sec-filing-rag` as a static non-production demonstration with no input, provider calls, database, or cost-generating endpoint.
+
+#### Scenario: Proof cleanup
+- **WHEN** the disposable proof is accepted or rejected
+- **THEN** its namespace and namespaced credentials are removed without deleting or mutating the persistent demonstration namespace
+
+### Requirement: Namespace-local ingress credentials
+Every public project namespace SHALL receive its own out-of-band GHCR pull Secret and Cloudflare Origin CA TLS Secret, and Traefik cross-namespace resource references SHALL remain disabled.
+
+#### Scenario: Tenant ingress TLS
+- **WHEN** a project Ingress terminates origin TLS
+- **THEN** it references the TLS Secret in the same namespace and no credential value appears in source control or ordinary evidence
+
 ### Requirement: PostgreSQL extension proof
 The first pre-foundation proof SHALL test compatible pinned pgvector and trial `pg_textsearch` versions together on PostgreSQL 18 using representative vector, BM25, and metadata-filtered retrieval without coupling the retriever contract to the extension.
 
